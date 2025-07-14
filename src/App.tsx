@@ -69,12 +69,15 @@ export default function MIDIComposerApp() {
     setProgression(newProgression);
   }, [inputString]);
 
-  useEffect(() => {
+useEffect(() => {
+  // 자동완성된 코드가 아닌 경우만 업데이트
+  if (document.activeElement?.tagName !== 'INPUT') {
     const updated = progression.map(p => `${p.chord}(${p.style})`).join('-');
     if (updated !== inputString) {
       setInputString(updated);
     }
-  }, [progression]);
+  }
+}, [progression]);
 
   const updateChord = (i: number, field: keyof ChordData, value: string) => {
     const updated = [...progression];
@@ -236,61 +239,74 @@ export default function MIDIComposerApp() {
     a.download = 'composition.mid';
     a.click();
   };
+return (
+  <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 800 }}>
+    <h2>Code Chord</h2>
 
-  return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 800 }}>
-      <h2>Code Chord</h2>
+  <div style={{ marginBottom: '1rem' }}>
+  <label>
+    <strong>
+      ⌨️
+      <span style={{ color: '#888', fontWeight: 'normal' }}>
+        (Cm7 - F7 - Bbmaj7 - Gm7)
+      </span>
+    </strong>
+  </label>
+  <input
+    type="text"
+    value={inputString}
+    onChange={e => setInputString(e.target.value)}
+    style={{ width: '100%', padding: '0.5rem', fontSize: '1rem' }}
+  />
+</div>
 
-      <div style={{ marginBottom: '1rem' }}>
-        <label>
-          <strong>코드 진행 입력 ⌨️(Cm7 - F7 - Bbmaj7 - Gm7)</strong>
-        </label>
-        <input
-          type="text"
-          value={inputString}
-          onChange={e => setInputString(e.target.value)}
-          style={{ width: '100%', padding: '0.5rem', fontSize: '1rem' }}
-        />
-      </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-        <label><strong>BPM:</strong></label>
-        <input
-          type="number"
-          value={bpm}
-          onChange={e => setBpm(Number(e.target.value))}
-        />
-        <label><strong>🔊 음량:</strong></label>
-        <input
-          type="range"
-          min="-24"
-          max="0"
-          value={volume}
-          onChange={e => setVolume(Number(e.target.value))}
-        />
-        <button onClick={play}>▶ 재생</button>
-        <button onClick={stopPlayback}>⏹ 멈춤</button>
-        <button onClick={generateMidi}>💾 MIDI 저장</button>
-      </div>
-
-      {progression.map((p, i) => (
-        <div key={i} style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <input
-            value={p.chord}
-            onChange={e => updateChord(i, 'chord', e.target.value)}
-            style={{ width: '100px' }}
-          />
-          <select
-            value={p.style}
-            onChange={e => updateChord(i, 'style', e.target.value)}
-          >
-            {styleOptions.map(s => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </select>
-          <button onClick={() => playChordPreview(p.chord, p.style)}>🎧 미리듣기</button>
-        </div>
-      ))}
+    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+      <label><strong>BPM:</strong></label>
+      <input
+        type="number"
+        value={bpm}
+        onChange={e => setBpm(Number(e.target.value))}
+      />
+      <label><strong>🔊</strong></label>
+      <input
+        type="range"
+        min="-24"
+        max="0"
+        value={volume}
+        onChange={e => setVolume(Number(e.target.value))}
+      />
+      <button onClick={play}>▶ PLAY</button>
+      <button onClick={stopPlayback}>⏹ STOP</button>
+      <button onClick={generateMidi}>💾 MIDI</button>
+      <a
+        href="https://github.com/Hwanji2/CodeCompose"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        🐈‍⬛
+      </a>
     </div>
-  );
+
+    {progression.map((p, i) => (
+      <div key={i} style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <input
+          value={p.chord}
+          onChange={e => updateChord(i, 'chord', e.target.value)}
+          style={{ width: '100px' }}
+        />
+        <select
+          value={p.style}
+          onChange={e => updateChord(i, 'style', e.target.value)}
+        >
+          {styleOptions.map(s => (
+            <option key={s.value} value={s.value}>{s.label}</option>
+          ))}
+        </select>
+        <button onClick={() => playChordPreview(p.chord, p.style)}>🎧 미리듣기</button>
+      </div>
+    ))}
+  </div>
+);
+
 }
